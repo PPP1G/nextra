@@ -1,5 +1,11 @@
 import '../style.css'
+import script from 'next/script'
 
 export default function App({ Component, pageProps }) {
-  return <Component {...pageProps} />
+  return (
+  <>
+    <Component {...pageProps} />
+    <script async src="https://umami.pluszhu.icu/script.js" data-website-id="a36a5b49-1ade-4e86-b7a4-91e64d642b7e"></script>
+  </>
+  )
 }
