@@ -32,7 +32,6 @@ module.exports = {
           'always',
           { enforceForIfStatements: true }
         ],
-        '@typescript-eslint/prefer-optional-chain': 'error',
         'no-else-return': ['error', { allowElseIf: false }],
         'no-lonely-if': 'error',
         'prefer-destructuring': [
@@ -109,7 +108,8 @@ module.exports = {
       rules: {
         '@typescript-eslint/no-unnecessary-type-assertion': 'error',
         '@typescript-eslint/consistent-type-imports': 'error',
-        '@typescript-eslint/non-nullable-type-assertion-style': 'error'
+        '@typescript-eslint/non-nullable-type-assertion-style': 'error',
+        '@typescript-eslint/prefer-optional-chain': 'error'
       }
     },
     // ⚙️ nextra-theme-docs
@@ -154,7 +154,7 @@ module.exports = {
         tailwindcss: {
           config: 'packages/nextra-theme-docs/tailwind.config.js',
           callees: ['cn'],
-          whitelist: ['nextra-code-block']
+          whitelist: ['nextra-code-block', 'nextra-filetree']
         }
       }
     },
