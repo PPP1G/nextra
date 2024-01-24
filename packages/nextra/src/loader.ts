@@ -26,6 +26,8 @@ const UNDERSCORE_APP_FILENAME: string =
 
 const HAS_UNDERSCORE_APP_MDX_FILE = existsSync(APP_MDX_PATH)
 
+const FOOTER_TO_REMOVE = 'export default MDXContent;'
+
 if (UNDERSCORE_APP_FILENAME) {
   console.warn(
     `[nextra] Found "${UNDERSCORE_APP_FILENAME}" file, refactor it to "_app.mdx" for better performance.`
@@ -163,37 +165,31 @@ async function loader(
 
   const {
     result,
-    headings,
     title,
     frontMatter,
     structurizedData,
     searchIndexKey,
     hasJsxInH1,
     readingTime
-  } = await compileMdx(
-    source,
-    {
-      mdxOptions: {
-        ...mdxOptions,
-        jsx: true,
-        outputFormat: 'program',
-        format: 'detect'
-      },
-      readingTime: _readingTime,
-      defaultShowCopyCode,
-      staticImage,
-      flexsearch,
-      latex,
-      codeHighlight,
-      route: pageNextRoute,
-      locale
+  } = await compileMdx(source, {
+    mdxOptions: {
+      ...mdxOptions,
+      jsx: true,
+      outputFormat: 'program',
+      format: 'detect'
     },
-    {
-      filePath: mdxPath,
-      useCachedCompiler: false, // TODO: produce hydration errors or error - Create a new processor first, by calling it: use `processor()` instead of `processor`.
-      isPageImport
-    }
-  )
+    readingTime: _readingTime,
+    defaultShowCopyCode,
+    staticImage,
+    flexsearch,
+    latex,
+    codeHighlight,
+    route: pageNextRoute,
+    locale,
+    filePath: mdxPath,
+    useCachedCompiler: true,
+    isPageImport
+  })
 
   // Imported as a normal component, no need to add the layout.
   if (!isPageImport) {
@@ -233,7 +229,7 @@ async function loader(
         path.relative(gitRoot, mdxPath)
       )
     } catch {
-      // Failed to get timestamp for this file. Silently ignore it.
+      // Failed to get timestamp for this file. Silently ignore it
     }
   }
 
@@ -244,7 +240,6 @@ async function loader(
     filePath: slash(path.relative(CWD, mdxPath)),
     route,
     ...(Object.keys(frontMatter).length > 0 && { frontMatter }),
-    headings,
     hasJsxInH1,
     timestamp,
     pageMap,
@@ -259,7 +254,7 @@ async function loader(
     // It is possible that a theme wants to attach customized data, or modify
     // some fields of `pageOpts`. One example is that the theme doesn't need
     // to access the full pageMap or frontMatter of other pages, and it's not
-    // necessary to include them in the bundle.
+    // necessary to include them in the bundle
     pageOpts = transformPageOpts(pageOpts as any)
   }
   const themeConfigImport = themeConfig
@@ -293,7 +288,8 @@ ${
     delete pageOpts.pageMap
   }
 
-  const stringifiedPageOpts = JSON.stringify(pageOpts)
+  const stringifiedPageOpts =
+    JSON.stringify(pageOpts).slice(0, -1) + `,headings:__toc}`
   const stringifiedChecksum = IS_PRODUCTION
     ? "''"
     : JSON.stringify(hashFnv32a(stringifiedPageOpts))
@@ -307,8 +303,15 @@ ${
     )
     .join(',')
 
-  return `import { setupNextraPage } from 'nextra/setup-page'
+  const lastIndexOfFooter = finalResult.lastIndexOf(FOOTER_TO_REMOVE)
+
+  const rawJs = `import { setupNextraPage } from 'nextra/setup-page'
 ${HAS_UNDERSCORE_APP_MDX_FILE ? '' : pageImports}
+${
+  // Remove the last match of `export default MDXContent;` because it can be existed in the raw MDX file
+  finalResult.slice(0, lastIndexOfFooter) +
+  finalResult.slice(lastIndexOfFooter + FOOTER_TO_REMOVE.length)
+}
 
 const __nextraPageOptions = {
   MDXContent,
@@ -321,10 +324,6 @@ const __nextraPageOptions = {
         (themeConfigImport && 'themeConfig: __nextra_themeConfig')
   }
 }
-${
-  // Remove the last match of `export default MDXContent` because it can be existed in the raw MDX file
-  finalResult.slice(0, finalResult.lastIndexOf('export default MDXContent;'))
-}
 if (process.env.NODE_ENV !== 'production') {
   __nextraPageOptions.hot = module.hot
   __nextraPageOptions.pageOptsChecksum = ${stringifiedChecksum}
@@ -332,6 +331,8 @@ if (process.env.NODE_ENV !== 'production') {
 if (typeof window === 'undefined') __nextraPageOptions.dynamicMetaModules = [${dynamicMetaModules}]
 
 export default setupNextraPage(__nextraPageOptions)`
+
+  return rawJs
 }
 
 export default function syncLoader(

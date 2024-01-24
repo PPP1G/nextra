@@ -14,7 +14,7 @@ function isTabObjectItem(item: unknown): item is TabObjectItem {
   return !!item && typeof item === 'object' && 'label' in item
 }
 
-export function Tabs({
+function _Tabs({
   items,
   selectedIndex: _selectedIndex,
   defaultIndex = 0,
@@ -114,10 +114,12 @@ export function Tabs({
 export function Tab({
   children,
   ...props
-}: ComponentProps<'div'>): ReactElement {
+}: ComponentProps<typeof HeadlessTab.Panel>): ReactElement {
   return (
     <HeadlessTab.Panel {...props} className="nx-rounded nx-pt-6">
       {children}
     </HeadlessTab.Panel>
   )
 }
+
+export const Tabs = Object.assign(_Tabs, { displayName: 'Tabs', Tab })

@@ -54,10 +54,7 @@ function NavbarMenu({
           leaveFrom="nx-opacity-100"
           leaveTo="nx-opacity-0"
         >
-          <Menu.Items
-            className="nx-absolute nx-right-0 nx-z-20 nx-mt-1 nx-max-h-64 nx-min-w-full nx-overflow-auto nx-rounded-md nx-ring-1 nx-ring-black/5 nx-bg-white nx-py-1 nx-text-sm nx-shadow-lg dark:nx-ring-white/20 dark:nx-bg-neutral-800"
-            tabIndex={0}
-          >
+          <Menu.Items className="nx-absolute nx-right-0 nx-z-20 nx-mt-1 nx-max-h-64 nx-min-w-full nx-overflow-auto nx-rounded-md nx-ring-1 nx-ring-black/5 nx-bg-white nx-py-1 nx-text-sm nx-shadow-lg dark:nx-ring-white/20 dark:nx-bg-neutral-800">
             {Object.entries(items || {}).map(([key, item]) => (
               <Menu.Item key={key}>
                 <Anchor
@@ -114,18 +111,13 @@ export function Navbar({ flatDirectories, items }: NavBarProps): ReactElement {
 
           if (pageOrMenu.type === 'menu') {
             const menu = pageOrMenu as MenuItem
-
-            const isActive =
-              menu.route === activeRoute ||
-              activeRoute.startsWith(menu.route + '/')
-
             return (
               <NavbarMenu
                 key={menu.title}
                 className={cn(
                   classes.link,
                   'nx-flex nx-gap-1',
-                  isActive ? classes.active : classes.inactive
+                  classes.inactive
                 )}
                 menu={menu}
               >

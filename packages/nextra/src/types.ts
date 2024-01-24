@@ -9,7 +9,7 @@ import type {
   META_FILENAME,
   NEXTRA_INTERNAL
 } from './constants'
-import type { PageMapCache } from './plugin'
+import type { PageMapCache } from './page-map'
 
 type MetaFilename = typeof META_FILENAME
 type MarkdownExtension = (typeof MARKDOWN_EXTENSIONS)[number]
@@ -82,7 +82,8 @@ export type Page = (MdxFile | Folder<Page>) & {
   meta?: Exclude<Meta, string>
 }
 
-export type Heading = Omit<MDASTHeading, 'type' | 'children' | 'position'> & {
+export type Heading = {
+  depth: MDASTHeading['depth']
   value: string
   id: string
 }
@@ -109,7 +110,7 @@ export type ReadingTime = {
 }
 
 type Theme = string
-type Flexsearch =
+export type Flexsearch =
   | boolean
   | {
       /**
@@ -201,4 +202,13 @@ export type DynamicMetaDescriptor = {
   metaFilePath: string
   metaObjectKeyPath: string
   metaParentKeyPath: string
+}
+
+export type StructurizedData = Record<string, string>
+
+export type SearchData = {
+  [route: string]: {
+    title: string
+    data: StructurizedData
+  }
 }

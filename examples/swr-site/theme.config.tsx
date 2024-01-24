@@ -1,7 +1,7 @@
 /* eslint sort-keys: error */
 import { useRouter } from 'next/router'
 import type { DocsThemeConfig } from 'nextra-theme-docs'
-import { useConfig } from 'nextra-theme-docs'
+import { LocaleSwitch, useConfig } from 'nextra-theme-docs'
 import type { ComponentProps, ReactElement } from 'react'
 
 const SWRLogo = (props: ComponentProps<'svg'>): ReactElement => (
@@ -72,7 +72,7 @@ const config: DocsThemeConfig = {
   editLink: {
     text: function useText() {
       const { locale } = useRouter()
-      return EDIT_TEXT[locale]
+      return EDIT_TEXT[locale!] // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
     }
   },
   feedback: {
@@ -93,9 +93,10 @@ const config: DocsThemeConfig = {
           rel="noreferrer"
           target="_blank"
           className="flex items-center gap-2 font-semibold"
-          href={FOOTER_LINK[locale]}
+          href={FOOTER_LINK[locale!]} // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
         >
-          {FOOTER_LINK_TEXT[locale]}
+          {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion */}
+          {FOOTER_LINK_TEXT[locale!]}
         </a>
       )
     }
@@ -159,12 +160,15 @@ const config: DocsThemeConfig = {
         <SWRLogo className="h-3" />
         <span
           className="hidden select-none font-extrabold ltr:ml-2 rtl:mr-2 md:inline"
-          title={`SWR: ${TITLE[locale] || ''}`}
+          title={`SWR: ${TITLE[locale!] || ''}`} // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
         >
           SWR
         </span>
       </>
     )
+  },
+  navbar: {
+    extraContent: LocaleSwitch
   },
   nextThemes: {
     defaultTheme: 'dark'
@@ -187,6 +191,7 @@ const config: DocsThemeConfig = {
     toggleButton: true
   },
   toc: {
+    backToTop: true,
     extraContent: (
       // eslint-disable-next-line @next/next/no-img-element -- ignore since url is external and dynamic
       <img alt="placeholder cat" src="https://placekitten.com/g/300/200" />

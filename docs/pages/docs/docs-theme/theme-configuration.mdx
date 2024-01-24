@@ -40,7 +40,7 @@ the `pages/` folder of your docs. For example:
 
 ```js
 export default {
-  docsRepositoryBase: 'https://github.com/shuding/nextra/blob/main/docs/pages'
+  docsRepositoryBase: 'https://github.com/shuding/nextra/tree/main/docs'
 }
 ```
 
@@ -87,6 +87,8 @@ that will be replaced by the page title.
 You can also return it conditionally to avoid adding the suffix to the homepage:
 
 ```js
+import { useRouter } from 'next/router'
+
 export default {
   useNextSeoProps() {
     const { asPath } = useRouter()
@@ -116,7 +118,7 @@ favicon, etc.
   ]}
 />
 
-#### Static head tags
+#### Static Head Tags
 
 If you have only static head tags, it’s easy to directly put them in `head`. For
 example:
@@ -133,7 +135,7 @@ export default {
 }
 ```
 
-#### Dynamic tags based on page
+#### Dynamic Tags Based on Page
 
 You can also use a _function component_ as `head` to dynamically generate the
 head tags based on the current page’s front matter. For example:
@@ -193,8 +195,8 @@ Customize the theme behavior of the website.
 
 ### Theme Color
 
-You can adjust the theme color of the website by setting a primary hue value to
-dark or light themes.
+You can adjust the theme color of the website by setting primary hue and
+saturation values for light and dark themes.
 
 <OptionTable
   options={[
@@ -202,29 +204,60 @@ dark or light themes.
       'primaryHue',
       'number | { dark: number; light: number }',
       'The hue of the primary theme color.'
+    ],
+    [
+      'primarySaturation',
+      'number | { dark: number; light: number }',
+      'The saturation of the primary theme color.'
     ]
   ]}
 />
 
 Try it out for this website:
 
-<div className="mt-4 flex h-6 items-center gap-2">
-  <input
-    type="range"
-    min="0"
-    max="360"
-    step="1"
-    onChange={e => {
-      const hue = e.target.value
-      document.documentElement.style.setProperty(
-        '--nextra-primary-hue',
-        hue + 'deg'
-      )
-      document.getElementById('test-theme-hue').innerText = hue
-    }}
-  />
-  <code id="test-theme-hue" className="text-sm text-gray-500"></code>
-</div>
+| Hue   | Saturation   |
+| ----- | ------------ |
+| {hue} | {saturation} |
+
+export const hue = (
+  <div className="flex h-6 items-center gap-2">
+    <input
+      type="range"
+      min="0"
+      max="360"
+      step="1"
+      onChange={e => {
+        const value = `${e.target.value}deg`
+        e.target.nextSibling.textContent = value
+        document.documentElement.style.setProperty(
+          '--nextra-primary-hue',
+          value
+        )
+      }}
+    />
+    <code className="w-14 text-sm text-gray-500" />
+  </div>
+)
+
+export const saturation = (
+  <div className="flex h-6 items-center gap-2">
+    <input
+      type="range"
+      min="0"
+      max="100"
+      step="1"
+      onChange={e => {
+        const value = `${e.target.value}%`
+        e.target.nextSibling.textContent = value
+        document.documentElement.style.setProperty(
+          '--nextra-primary-saturation',
+          value
+        )
+      }}
+    />
+    <code className="text-sm text-gray-500 w-14" />
+  </div>
+)
 
 ## Navbar
 
@@ -477,13 +510,13 @@ an active/focused route will automatically collapse up to the level set by
 `sidebar.defaultMenuCollapseLevel`. e.g. if `defaultMenuCollapseLevel` is `2`,
 then top-level folders will not auto-collapse.
 
-### Customize sidebar content
+### Customize Sidebar Content
 
 Together with the [Separators](/docs/docs-theme/page-configuration#separators)
 item, you can customize how the sidebar content is rendered by using the
 `sidebar.titleComponent` option:
 
-import { Tab, Tabs } from 'nextra/components'
+import { Tabs } from 'nextra/components'
 import sidebarTitleComponentImage from '../../../public/assets/docs/sidebar-customized.png'
 
 <Screenshot src={sidebarTitleComponentImage} alt="Customized Sidebar" />
@@ -494,7 +527,7 @@ import sidebarTitleComponentImage from '../../../public/assets/docs/sidebar-cust
 </div>
 
 <Tabs items={['theme.config.jsx', 'pages/_meta.json']}>
-  <Tab>
+  <Tabs.Tab>
     ```jsx
     export default {
       sidebar: {
@@ -512,8 +545,8 @@ import sidebarTitleComponentImage from '../../../public/assets/docs/sidebar-cust
       }
     }
     ```
-  </Tab>
-  <Tab>
+  </Tabs.Tab>
+  <Tabs.Tab>
     ```json
     {
       "index": "Intro",
@@ -525,7 +558,7 @@ import sidebarTitleComponentImage from '../../../public/assets/docs/sidebar-cust
       "about": "About"
     }
     ```
-  </Tab>
+  </Tabs.Tab>
 </Tabs>
 
 ## Content
@@ -594,7 +627,8 @@ navigating between headings.
       'toc.headingComponent',
       'React.FC<{ id: string, children: string }>',
       'Custom renderer of TOC headings.'
-    ]
+    ],
+    ['toc.backToTop', 'boolean', 'Add `Scroll to top` link.']
   ]}
 />
 
@@ -722,7 +756,7 @@ default footer, or fully customize it with a custom component.
   ]}
 />
 
-### Copyright information
+### Copyright Information
 
 You can add some simple content, such as copyright information to the default
 footer:
